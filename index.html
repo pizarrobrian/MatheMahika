@@ -33,18 +33,18 @@
         .app-wrapper {
             display: flex;
             width: 100%;
-            max-width: 1200px;
-            gap: 28px;
+            max-width: 1600px;
+            gap: 20px;
         }
 
         .sidebar {
-            width: 260px;
+            width: 280px;
             background-color: #f1f5fb;
             border-radius: 24px;
-            padding: 28px 24px;
+            padding: 24px 20px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
         }
 
         .sidebar h2 {
@@ -62,7 +62,24 @@
             color: #3f4c6b;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .nav-item:hover::before {
+            left: 100%;
         }
 
         .nav-item.active,
@@ -80,12 +97,31 @@
             flex: 1;
             background: white;
             border-radius: 28px;
-            padding: 40px 48px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            gap: 32px;
+            height: calc(100vh - 40px);
+            max-height: calc(100vh - 40px);
+            min-width: 0;
+        }
+
+        .content-section {
+            flex: 1;
+            padding: 32px 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            opacity: 1;
+            transform: translateX(0);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .content-section.hidden {
+            display: none;
+            opacity: 0;
+            transform: translateX(20px);
         }
 
         .section-header {
@@ -106,8 +142,8 @@
 
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 32px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
             margin-bottom: 8px;
         }
 
@@ -194,6 +230,10 @@
             font-size: 12px;
             color: #6c7aa0;
             letter-spacing: 0.06em;
+            background-color: #f8f9fe;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .table-card tbody tr:hover {
@@ -214,8 +254,8 @@
 
         .quiz-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
         }
 
         .quiz-card {
@@ -248,8 +288,8 @@
 
         .data-section {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
         }
 
         .data-card {
@@ -278,8 +318,8 @@
 
         .split-layout {
             display: grid;
-            grid-template-columns: minmax(320px, 360px) minmax(0, 1fr);
-            gap: 24px;
+            grid-template-columns: minmax(380px, 420px) minmax(0, 1fr);
+            gap: 20px;
         }
 
         .header {
@@ -458,8 +498,363 @@
             text-decoration: underline;
         }
 
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            color: #333;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .checkbox-group a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .checkbox-group a:hover {
+            text-decoration: underline;
+        }
+
         .hidden {
             display: none !important;
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #666;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .modal-body {
+            color: #333;
+            line-height: 1.8;
+        }
+
+        .modal-body h3 {
+            color: #667eea;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .modal-body p {
+            margin-bottom: 15px;
+        }
+
+        .modal-body ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .modal-body li {
+            margin-bottom: 8px;
+        }
+
+        /* Question Row Styles */
+        .question-row {
+            display: grid;
+            grid-template-columns: 1fr 60px 1fr 80px 1fr 40px;
+            gap: 8px;
+            align-items: center;
+            padding: 12px;
+            background-color: rgba(102, 126, 234, 0.05);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .question-row input,
+        .question-row select {
+            padding: 8px 12px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .question-row input:focus,
+        .question-row select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .question-row .operator-select {
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .question-row .remove-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .question-row .remove-btn:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+
+        /* View Quiz Problem Styles */
+        .problem-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background-color: rgba(102, 126, 234, 0.05);
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .problem-number {
+            background-color: #667eea;
+            color: white;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            min-width: 32px;
+            text-align: center;
+        }
+
+        .problem-equation {
+            flex: 1;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-size: 18px;
+            color: #323f90;
+            font-weight: 500;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Custom scrollbar styling */
+        .content-section::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .content-section::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .content-section::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+        }
+
+        .content-section::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+
+        /* Scrollbar for table container */
+        .table-card--list > div::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .table-card--list > div::-webkit-scrollbar-track {
+            background: #f8f9fe;
+            border-radius: 5px;
+        }
+
+        .table-card--list > div::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 5px;
+        }
+
+        .table-card--list > div::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+
+        /* Leaderboard Styles */
+        .leaderboard-row {
+            background: #f8f9fe;
+            border-radius: 16px;
+            padding: 24px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .leaderboard-row:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .leaderboard-row.rank-1 {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border-color: #ffd700;
+        }
+
+        .leaderboard-row.rank-2 {
+            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+            border-color: #c0c0c0;
+        }
+
+        .leaderboard-row.rank-3 {
+            background: linear-gradient(135deg, #cd7f32 0%, #e9a66f 100%);
+            border-color: #cd7f32;
+        }
+
+        .rank-badge {
+            font-size: 28px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .player-info {
+            flex: 1;
+        }
+
+        .player-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #323f90;
+            margin-bottom: 8px;
+        }
+
+        .player-score {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .filter-btn {
+            padding: 10px 18px !important;
+            border-radius: 20px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+        }
+
+        /* Improve table responsiveness */
+        .table-card--list {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-card--list table {
+            min-width: 640px;
+        }
+
+        /* Add loading state for better UX */
+        .loading-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            color: #6c7aa0;
+            font-size: 16px;
+        }
+
+        @media (max-width: 1400px) {
+            .app-wrapper {
+                max-width: 1400px;
+            }
         }
 
         @media (max-width: 1024px) {
@@ -471,6 +866,7 @@
             .app-wrapper {
                 flex-direction: column;
                 max-width: 100%;
+                height: calc(100vh - 32px);
             }
 
             .sidebar {
@@ -479,6 +875,7 @@
                 overflow-x: auto;
                 gap: 8px;
                 padding: 12px;
+                flex-shrink: 0;
             }
 
             .sidebar h2 {
@@ -493,6 +890,11 @@
             }
 
             .main-content {
+                height: calc(100vh - 200px);
+                max-height: calc(100vh - 200px);
+            }
+
+            .content-section {
                 padding: 24px;
             }
 
@@ -530,12 +932,18 @@
                 padding: 28px 24px;
             }
 
+            .app-wrapper {
+                height: calc(100vh - 24px);
+            }
+
             .cards-grid {
                 grid-template-columns: 1fr;
             }
 
             .sidebar {
                 flex-wrap: wrap;
+                height: auto;
+                min-height: 120px;
             }
 
             .nav-item {
@@ -544,6 +952,11 @@
             }
 
             .main-content {
+                height: calc(100vh - 180px);
+                max-height: calc(100vh - 180px);
+            }
+
+            .content-section {
                 padding: 20px;
             }
 
@@ -564,6 +977,229 @@
     </style>
 </head>
 <body>
+    <!-- Terms and Conditions Modal -->
+    <div id="termsModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📋 Terms and Conditions</h2>
+                <button class="modal-close" onclick="closeTermsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Effective Date:</strong> October 2025</p>
+                
+                <h3>1. Acceptance of Terms</h3>
+                <p>By accessing the MatheMahika Admin Panel, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions. If you do not agree, please do not use this system.</p>
+                
+                <h3>2. Admin Responsibilities</h3>
+                <p>As an administrator, you agree to:</p>
+                <ul>
+                    <li>Maintain the confidentiality of your login credentials</li>
+                    <li>Use the system responsibly and ethically</li>
+                    <li>Protect student data and privacy at all times</li>
+                    <li>Not share access with unauthorized individuals</li>
+                    <li>Report any security concerns immediately</li>
+                </ul>
+                
+                <h3>3. Data Privacy and Security</h3>
+                <p>You must comply with all applicable data protection laws and regulations. Student information must be handled with the utmost care and used only for legitimate educational purposes.</p>
+                
+                <h3>4. Prohibited Activities</h3>
+                <p>The following activities are strictly prohibited:</p>
+                <ul>
+                    <li>Unauthorized access or attempted access to restricted areas</li>
+                    <li>Modification or deletion of data without proper authorization</li>
+                    <li>Sharing or distributing student information without consent</li>
+                    <li>Using the system for any illegal or unethical purposes</li>
+                </ul>
+                
+                <h3>5. System Availability</h3>
+                <p>While we strive to maintain system availability, we do not guarantee uninterrupted access. The system may be unavailable due to maintenance, updates, or technical issues.</p>
+                
+                <h3>6. Changes to Terms</h3>
+                <p>We reserve the right to modify these Terms and Conditions at any time. Continued use of the system after changes constitutes acceptance of the modified terms.</p>
+                
+                <h3>7. Contact Information</h3>
+                <p>For questions or concerns regarding these terms, please contact the system administrator.</p>
+                
+                <p style="margin-top: 20px;"><em>By checking the agreement box and logging in, you confirm that you have read and accept these Terms and Conditions.</em></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Student Password Modal -->
+    <div id="editPasswordModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>🔑 Edit Student Password</h2>
+                <button class="modal-close" onclick="closeEditPasswordModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 20px; color: #6c7aa0;">Update the password for <strong id="editStudentName" style="color: #323f90;"></strong></p>
+                
+                <form id="editPasswordForm" onsubmit="saveNewPassword(event)">
+                    <div class="form-group">
+                        <label for="newStudentPassword">New Password:</label>
+                        <input type="password" id="newStudentPassword" name="newStudentPassword" required placeholder="Enter new password" minlength="6">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmStudentPassword">Confirm Password:</label>
+                        <input type="password" id="confirmStudentPassword" name="confirmStudentPassword" required placeholder="Confirm new password" minlength="6">
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 24px;">
+                        <button type="submit" class="btn btn-primary" id="savePasswordBtn">
+                            Save Password
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="closeEditPasswordModal()">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+
+                <div id="editPasswordMessage" class="message" style="display: none; margin-top: 16px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Quiz Modal -->
+    <div id="addQuizModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>➕ Add New Quiz</h2>
+                <button class="modal-close" onclick="closeAddQuizModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addQuizForm" onsubmit="saveQuiz(event)">
+                    <!-- Quiz Name -->
+                    <div class="form-group">
+                        <label for="quizName">Quiz Name:</label>
+                        <input type="text" id="quizName" name="quizName" required placeholder="Enter quiz name (e.g., Math Challenge Level 1)">
+                    </div>
+
+                    <!-- Quiz Type Selection -->
+                    <div class="form-group">
+                        <label for="quizType">Quiz Type:</label>
+                        <select id="quizType" name="quizType" required onchange="updateOperationOptions()">
+                            <option value="">-- Select Quiz Type --</option>
+                            <option value="openworld">🌍 Open World (Mixed Operations)</option>
+                            <option value="clawmachine">🎮 Claw Machine (Single Operation)</option>
+                        </select>
+                    </div>
+
+                    <!-- Operation Selection (for Claw Machine only) -->
+                    <div class="form-group" id="operationGroup" style="display: none;">
+                        <label for="quizOperation">Operation:</label>
+                        <select id="quizOperation" name="quizOperation">
+                            <option value="">-- Select Operation --</option>
+                            <option value="addition">➕ Addition</option>
+                            <option value="subtraction">➖ Subtraction</option>
+                            <option value="multiplication">✖️ Multiplication</option>
+                            <option value="division">➗ Division</option>
+                        </select>
+                    </div>
+
+                    <!-- Attempts -->
+                    <div class="form-group">
+                        <label for="quizAttempts">Attempts Allowed:</label>
+                        <input type="number" id="quizAttempts" name="quizAttempts" required min="1" max="10" placeholder="Enter number of attempts (1-10)" value="3">
+                    </div>
+
+                    <!-- Score Per Question -->
+                    <div class="form-group">
+                        <label for="quizScore">Score Per Correct Answer:</label>
+                        <input type="number" id="quizScore" name="quizScore" required min="1" max="100" placeholder="Enter points per correct answer (e.g., 5)" value="5">
+                        <small style="color: #6c7aa0; font-size: 12px; margin-top: 4px; display: block;">Each correct answer will be worth this many points</small>
+                    </div>
+
+                    <!-- Set Time Limit -->
+                    <div class="form-group">
+                        <label for="quizTimeLimit">Time Limit (minutes):</label>
+                        <input type="number" id="quizTimeLimit" name="quizTimeLimit" required min="1" max="180" placeholder="Enter time limit in minutes (e.g., 30)" value="30">
+                        <small style="color: #6c7aa0; font-size: 12px; margin-top: 4px; display: block;">Students must complete the quiz within this time</small>
+                    </div>
+
+                    <!-- Set Deadline -->
+                    <div class="form-group">
+                        <label for="quizDeadline">Deadline:</label>
+                        <input type="datetime-local" id="quizDeadline" name="quizDeadline" required>
+                        <small style="color: #6c7aa0; font-size: 12px; margin-top: 4px; display: block;">Quiz will be unavailable after this date and time</small>
+                    </div>
+
+                    <!-- Questions Section -->
+                    <div class="form-group">
+                        <label>Questions:</label>
+                        <div id="questionsContainer" style="margin-top: 12px;">
+                            <!-- Questions will be dynamically added here -->
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="addQuestionRow()" style="margin-top: 12px; width: auto; padding: 8px 16px;">
+                            ➕ Add Question
+                        </button>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div style="display: flex; gap: 10px; margin-top: 24px;">
+                        <button type="submit" class="btn btn-primary">
+                            💾 Save Quiz
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="closeAddQuizModal()">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+
+                <div id="addQuizMessage" class="message" style="display: none; margin-top: 16px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Quiz Modal -->
+    <div id="viewQuizModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2 id="viewQuizTitle">📝 Quiz Details</h2>
+                <button class="modal-close" onclick="closeViewQuizModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Quiz Problems -->
+                <h3 style="color: #323f90; margin-bottom: 16px;">Problems:</h3>
+                <div id="viewQuizProblems" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px;">
+                    <!-- Problems will be dynamically loaded here -->
+                </div>
+
+                <!-- Student Results -->
+                <h3 style="color: #323f90; margin-bottom: 16px;">Student Results:</h3>
+                <div style="max-height: 400px; overflow-y: auto; border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.1);">
+                    <table id="viewQuizStudentsTable" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Score</th>
+                                <th>✅ Correct</th>
+                                <th>❌ Incorrect</th>
+                                <th>Time Taken</th>
+                                <th>Answered</th>
+                            </tr>
+                        </thead>
+                        <tbody id="viewQuizStudentsTableBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 20px; color: #6c7aa0;">
+                                    No students have taken this quiz yet.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top: 24px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeViewQuizModal()">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Connection Status Indicator -->
     <div id="connectionStatus" class="connection-status disconnected hidden">
         🔴 Checking Connection...
@@ -584,6 +1220,13 @@
             <div class="form-group">
                 <label for="adminPassword">Admin Password:</label>
                 <input type="password" id="adminPassword" name="adminPassword" required placeholder="Enter admin password">
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="adminTermsCheckbox" name="adminTermsCheckbox">
+                <label for="adminTermsCheckbox">
+                    I agree to the <a href="#" onclick="event.preventDefault(); openTermsModal();">Terms and Conditions</a>
+                </label>
             </div>
 
             <button type="submit" class="btn btn-primary" id="adminLoginBtn">
@@ -608,6 +1251,10 @@
             <div class="nav-item" data-section="quiz">
                 <span>🧠</span>
                 <div>Quiz</div>
+            </div>
+            <div class="nav-item" data-section="leaderboards">
+                <span>🏆</span>
+                <div>Leaderboards</div>
             </div>
             <div class="nav-item" data-section="reports">
                 <span>📊</span>
@@ -658,95 +1305,113 @@
             </section>
 
             <section id="studentsSection" class="content-section hidden">
-                <div class="split-layout">
-                    <div class="table-card">
-                        <h3 class="subheading">Register Student</h3>
-                        <form id="registrationForm">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required 
-                       placeholder="Enter username" minlength="3" maxlength="20">
-            </div>
-            
-            <div class="form-group">
-                <label for="fullName">Full Name:</label>
-                <input type="text" id="fullName" name="fullName" required 
-                       placeholder="Enter full name">
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required 
-                       placeholder="Enter email address">
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required 
-                       placeholder="Enter password" minlength="6">
-            </div>
-            
-            <div class="form-group">
-                <label for="confirmPassword">Confirm Password:</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required 
-                       placeholder="Confirm password">
-            </div>
-            
-            <button type="submit" class="btn btn-primary" id="submitBtn">
-                Create Account
-            </button>
-            
-            <button type="button" class="btn btn-secondary" onclick="resetForm()">
-                Reset Form
-            </button>
-        </form>
+                <div class="table-card table-card--list">
+                    <h3 class="subheading">All Students</h3>
+                    <div class="tag">🪄 Auto-sync with Firebase</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>🎮 Claw Machine</th>
+                                <th>🌍 Open World</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody">
+                            <tr>
+                                <td>Juan Dela Cruz</td>
+                                <td>juan@math.com</td>
+                                <td>98</td>
+                                <td>85</td>
+                                <td>
+                                    <div class="user-row-actions">
+                                        <button class="small-btn">View</button>
+                                        <button class="small-btn">Archive</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Maria Santos</td>
+                                <td>maria@math.com</td>
+                                <td>95</td>
+                                <td>92</td>
+                                <td>
+                                    <div class="user-row-actions">
+                                        <button class="small-btn">View</button>
+                                        <button class="small-btn">Archive</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Carlos Reyes</td>
+                                <td>carlos@math.com</td>
+                                <td>92</td>
+                                <td>88</td>
+                                <td>
+                                    <div class="user-row-actions">
+                                        <button class="small-btn">View</button>
+                                        <button class="small-btn">Archive</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
-        <div id="message" class="message" style="display: none;"></div>
-                    </div>
+            <section id="quizSection" class="content-section hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h2 style="color: #323f90; font-size: 24px; font-weight: 700;">Quiz Management</h2>
+                    <button class="btn btn-primary" onclick="openAddQuizModal()" style="width: auto; padding: 12px 24px;">
+                        ➕ Add Quiz
+                    </button>
+                </div>
 
-                    <div class="table-card">
-                        <h3 class="subheading">Recent Students</h3>
-                        <div class="tag">🪄 Auto-sync with Firebase</div>
+                <div class="table-card table-card--list">
+                    <h3 class="subheading">All Quizzes</h3>
+                    <div class="tag">📝 Manage your quizzes</div>
+                    <div style="max-height: 600px; overflow-y: auto; border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.1); margin-top: 20px;">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Score</th>
+                                    <th>Quiz Name</th>
+                                    <th>Quiz Type</th>
+                                    <th>Operation</th>
+                                    <th>Questions</th>
+                                    <th>Attempts</th>
+                                    <th>Created</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="studentsTableBody">
+                            <tbody id="quizzesTableBody">
                                 <tr>
-                                    <td>Juan Dela Cruz</td>
-                                    <td>juan@math.com</td>
-                                    <td>98</td>
+                                    <td>Math Challenge Level 1</td>
+                                    <td>🌍 Open World</td>
+                                    <td>Mixed Operations</td>
+                                    <td>10 questions</td>
+                                    <td>3</td>
+                                    <td>Oct 10, 2025</td>
                                     <td>
                                         <div class="user-row-actions">
-                                            <button class="small-btn">View</button>
-                                            <button class="small-btn">Archive</button>
+                                            <button class="small-btn">👁️ View</button>
+                                            <button class="small-btn">✏️ Edit</button>
+                                            <button class="small-btn">🗑️ Delete</button>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Maria Santos</td>
-                                    <td>maria@math.com</td>
-                                    <td>95</td>
+                                    <td>Addition Practice</td>
+                                    <td>🎮 Claw Machine</td>
+                                    <td>Addition</td>
+                                    <td>8 questions</td>
+                                    <td>5</td>
+                                    <td>Oct 9, 2025</td>
                                     <td>
                                         <div class="user-row-actions">
-                                            <button class="small-btn">View</button>
-                                            <button class="small-btn">Archive</button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Carlos Reyes</td>
-                                    <td>carlos@math.com</td>
-                                    <td>92</td>
-                                    <td>
-                                        <div class="user-row-actions">
-                                            <button class="small-btn">View</button>
-                                            <button class="small-btn">Archive</button>
+                                            <button class="small-btn">👁️ View</button>
+                                            <button class="small-btn">✏️ Edit</button>
+                                            <button class="small-btn">🗑️ Delete</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -756,29 +1421,31 @@
                 </div>
             </section>
 
-            <section id="quizSection" class="content-section hidden">
-                <div class="quiz-grid">
-                    <div class="quiz-card">
-                        <h3>Open World Adventure</h3>
-                        <p style="color: #6c7aa0;">Average Score</p>
-                        <strong style="font-size: 28px; color: #323f90;">95.33</strong>
-                        <div class="progress-bar"><span style="width: 95.33%;"></span></div>
-                        <div class="tag">🔥 Top: Juan Dela Cruz (98)</div>
+            <section id="leaderboardsSection" class="content-section hidden">
+                <div class="section-header">
+                    <h1 id="leaderboardTitle">🏆 CLAW MACHINE Leaderboard</h1>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <h3 style="margin-bottom: 12px; color: #323f90;">Filter by Math Operation:</h3>
+                    <div id="filterButtons" style="display: flex; flex-wrap: wrap; gap: 12px;">
+                        <!-- Claw Machine Filters (default) -->
+                        <button class="small-btn filter-btn active" onclick="filterLeaderboard('')">All</button>
+                        <button class="small-btn filter-btn" onclick="filterLeaderboard('Addition')">Addition</button>
+                        <button class="small-btn filter-btn" onclick="filterLeaderboard('Subtraction')">Subtraction</button>
+                        <button class="small-btn filter-btn" onclick="filterLeaderboard('Multiplication')">Multiplication</button>
+                        <button class="small-btn filter-btn" onclick="filterLeaderboard('Division')">Division</button>
                     </div>
-                    <div class="quiz-card">
-                        <h3>Claw Machine Challenge</h3>
-                        <p style="color: #6c7aa0;">Average Score</p>
-                        <strong style="font-size: 28px; color: #323f90;">90.33</strong>
-                        <div class="progress-bar"><span style="width: 90.33%;"></span></div>
-                        <div class="tag">⭐ Top: Maria Santos (95)</div>
-                    </div>
-                    <div class="quiz-card">
-                        <h3>Timed Mastery</h3>
-                        <p style="color: #6c7aa0;">Average Score</p>
-                        <strong style="font-size: 28px; color: #323f90;">89.00</strong>
-                        <div class="progress-bar"><span style="width: 89%;"></span></div>
-                        <div class="tag">⚡ Top: Carlos Reyes (93)</div>
-                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;" id="leaderboardContainer">
+                    <!-- Top 10 will be generated dynamically -->
+                </div>
+
+                <div style="margin-top: 24px;">
+                    <button class="btn btn-primary" onclick="toggleLeaderboardMode()" style="width: auto; padding: 12px 24px;">
+                        <span id="toggleModeText">Switch to OPEN WORLD</span>
+                    </button>
                 </div>
             </section>
 
@@ -806,20 +1473,228 @@
             </section>
 
             <section id="accountSection" class="content-section hidden">
-                <div class="table-card">
-                    <h3 class="subheading">Profile</h3>
-                    <p style="margin-bottom: 12px; color: #6c7aa0;">Securely update your admin password.</p>
-                    <form id="passwordUpdateForm">
-                        <div class="form-group">
-                            <label for="newAdminPassword">New Admin Password:</label>
-                            <input type="password" id="newAdminPassword" name="newAdminPassword" placeholder="Enter new admin password" minlength="6">
+                <div class="split-layout">
+                    <div class="table-card">
+                        <h3 class="subheading">Register Student</h3>
+                        <form id="registrationForm">
+                            <div class="form-group">
+                                <label for="username">Username:</label>
+                                <input type="text" id="username" name="username" required 
+                                       placeholder="Enter username" minlength="3" maxlength="20">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="fullName">Full Name:</label>
+                                <input type="text" id="fullName" name="fullName" required 
+                                       placeholder="Enter full name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">Email:</label>
+                                <input type="email" id="email" name="email" required 
+                                       placeholder="Enter email address">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="password">Password:</label>
+                                <input type="password" id="password" name="password" required 
+                                       placeholder="Enter password" minlength="6">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm Password:</label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" required 
+                                       placeholder="Confirm password">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                Create Account
+                            </button>
+                            
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                                Reset Form
+                            </button>
+                        </form>
+
+                        <div id="message" class="message" style="display: none;"></div>
+                    </div>
+
+                    <div class="table-card table-card--list">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <div>
+                                <h3 class="subheading" style="margin-bottom: 8px;">Recently Created Accounts</h3>
+                                <div class="tag">📅 All Registrations (Newest First)</div>
+                            </div>
+                            <button id="deleteSelectedBtn" class="btn btn-primary" style="width: auto; padding: 10px 20px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); display: none;" onclick="deleteSelectedAccounts()">
+                                🗑️ Delete Selected (<span id="selectedCount">0</span>)
+                            </button>
                         </div>
-                        <button type="button" class="btn btn-primary" id="updatePasswordBtn">
-                            Update Password
-                        </button>
-                    </form>
-                    <div id="accountMessage" class="message" style="display: none;"></div>
-        </div>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <div style="position: relative; max-width: 400px;">
+                                <input 
+                                    type="text" 
+                                    id="userSearchInput" 
+                                    placeholder="🔍 Search by name, username, or email..." 
+                                    onkeyup="searchUsers()"
+                                    style="width: 100%; padding: 12px 40px 12px 16px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 14px; transition: border-color 0.3s ease; outline: none;"
+                                    onfocus="this.style.borderColor='#667eea'"
+                                    onblur="this.style.borderColor='#e1e5e9'"
+                                >
+                                <button 
+                                    onclick="clearSearch()" 
+                                    id="clearSearchBtn"
+                                    style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; color: #9ca3af; padding: 4px 8px; display: none;"
+                                    title="Clear search"
+                                >✕</button>
+                            </div>
+                            <div id="searchResults" style="margin-top: 8px; font-size: 13px; color: #6c7aa0;"></div>
+                        </div>
+                        
+                        <div style="max-height: 500px; overflow-y: auto; border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.1);">
+                            <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;">
+                                        <input type="checkbox" id="selectAllAccounts" onchange="toggleSelectAll(this)" style="width: 18px; height: 18px; cursor: pointer; accent-color: #667eea;">
+                                    </th>
+                                    <th>Full Name</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Created Date</th>
+                                    <th>Status</th>
+                                    <th style="width: 180px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentAccountsTableBody">
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="account-checkbox" data-account-id="1" onchange="updateDeleteButton()" style="width: 18px; height: 18px; cursor: pointer; accent-color: #667eea;">
+                                    </td>
+                                    <td>Juan Dela Cruz</td>
+                                    <td>juan_dc</td>
+                                    <td>juan@math.com</td>
+                                    <td>Oct 13, 2025</td>
+                                    <td><span class="pill" style="background-color: rgba(34, 197, 94, 0.15); color: #15803d;">Active</span></td>
+                                    <td>
+                                        <div class="user-row-actions">
+                                            <button class="small-btn" onclick="editAccountDetails(1)">✏️ Edit</button>
+                                            <button class="small-btn" style="background-color: rgba(239, 68, 68, 0.12); color: #dc2626;" onclick="deleteAccount(1)">🗑️ Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="account-checkbox" data-account-id="2" onchange="updateDeleteButton()" style="width: 18px; height: 18px; cursor: pointer; accent-color: #667eea;">
+                                    </td>
+                                    <td>Maria Santos</td>
+                                    <td>maria_s</td>
+                                    <td>maria@math.com</td>
+                                    <td>Oct 12, 2025</td>
+                                    <td><span class="pill" style="background-color: rgba(34, 197, 94, 0.15); color: #15803d;">Active</span></td>
+                                    <td>
+                                        <div class="user-row-actions">
+                                            <button class="small-btn" onclick="editAccountDetails(2)">✏️ Edit</button>
+                                            <button class="small-btn" style="background-color: rgba(239, 68, 68, 0.12); color: #dc2626;" onclick="deleteAccount(2)">🗑️ Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="account-checkbox" data-account-id="3" onchange="updateDeleteButton()" style="width: 18px; height: 18px; cursor: pointer; accent-color: #667eea;">
+                                    </td>
+                                    <td>Carlos Reyes</td>
+                                    <td>carlos_r</td>
+                                    <td>carlos@math.com</td>
+                                    <td>Oct 11, 2025</td>
+                                    <td><span class="pill" style="background-color: rgba(34, 197, 94, 0.15); color: #15803d;">Active</span></td>
+                                    <td>
+                                        <div class="user-row-actions">
+                                            <button class="small-btn" onclick="editAccountDetails(3)">✏️ Edit</button>
+                                            <button class="small-btn" style="background-color: rgba(239, 68, 68, 0.12); color: #dc2626;" onclick="deleteAccount(3)">🗑️ Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="account-checkbox" data-account-id="4" onchange="updateDeleteButton()" style="width: 18px; height: 18px; cursor: pointer; accent-color: #667eea;">
+                                    </td>
+                                    <td>Ana Lopez</td>
+                                    <td>ana_lopez</td>
+                                    <td>ana@math.com</td>
+                                    <td>Oct 10, 2025</td>
+                                    <td><span class="pill" style="background-color: rgba(34, 197, 94, 0.15); color: #15803d;">Active</span></td>
+                                    <td>
+                                        <div class="user-row-actions">
+                                            <button class="small-btn" onclick="editAccountDetails(4)">✏️ Edit</button>
+                                            <button class="small-btn" style="background-color: rgba(239, 68, 68, 0.12); color: #dc2626;" onclick="deleteAccount(4)">🗑️ Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="account-checkbox" data-account-id="5" onchange="updateDeleteButton()" style="width: 18px; height: 18px; cursor: pointer; accent-color: #667eea;">
+                                    </td>
+                                    <td>Pedro Garcia</td>
+                                    <td>pedro_g</td>
+                                    <td>pedro@math.com</td>
+                                    <td>Oct 9, 2025</td>
+                                    <td><span class="pill" style="background-color: rgba(34, 197, 94, 0.15); color: #15803d;">Active</span></td>
+                                    <td>
+                                        <div class="user-row-actions">
+                                            <button class="small-btn" onclick="editAccountDetails(5)">✏️ Edit</button>
+                                            <button class="small-btn" style="background-color: rgba(239, 68, 68, 0.12); color: #dc2626;" onclick="deleteAccount(5)">🗑️ Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="split-layout" style="margin-top: 24px;">
+                    <div class="table-card">
+                        <h3 class="subheading">Admin Profile</h3>
+                        <p style="margin-bottom: 12px; color: #6c7aa0;">Securely update your admin password.</p>
+                        <form id="passwordUpdateForm">
+                            <div class="form-group">
+                                <label for="newAdminPassword">New Admin Password:</label>
+                                <input type="password" id="newAdminPassword" name="newAdminPassword" placeholder="Enter new admin password" minlength="6">
+                            </div>
+                            <button type="button" class="btn btn-primary" id="updatePasswordBtn">
+                                Update Password
+                            </button>
+                        </form>
+                        <div id="accountMessage" class="message" style="display: none;"></div>
+                    </div>
+
+                    <div class="table-card">
+                        <h3 class="subheading">Admins</h3>
+                        <div class="tag">👥 Admin Credentials</div>
+                        <div style="margin-top: 16px;">
+                            <div style="padding: 16px; background-color: rgba(102, 126, 234, 0.08); border-radius: 12px; margin-bottom: 12px;">
+                                <p style="font-weight: 600; color: #323f90; margin-bottom: 8px; font-size: 15px;">Primary Admin</p>
+                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span style="font-size: 13px; color: #6c7aa0; font-weight: 600;">Username:</span>
+                                        <span id="adminUsernameDisplay" style="font-size: 13px; color: #323f90; font-family: monospace; background-color: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 4px;">admin</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span style="font-size: 13px; color: #6c7aa0; font-weight: 600;">Password:</span>
+                                        <span id="adminPasswordDisplay" style="font-size: 13px; color: #323f90; font-family: monospace; background-color: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 4px;">••••••</span>
+                                        <button onclick="togglePasswordVisibility()" style="background: none; border: none; cursor: pointer; font-size: 16px; padding: 2px 6px;" title="Toggle password visibility">👁️</button>
+                                    </div>
+                                </div>
+                                <p style="font-size: 12px; color: #9ca3af; margin-top: 8px;">Initialized: System Default</p>
+                            </div>
+                            <div style="padding: 12px; background-color: rgba(239, 68, 68, 0.08); border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                                <p style="font-size: 12px; color: #dc2626; font-weight: 600; margin-bottom: 4px;">⚠️ Security Notice</p>
+                                <p style="font-size: 11px; color: #dc2626;">Please update the default admin password immediately for security.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
         </main>
     </div>
@@ -843,6 +1718,74 @@
 
         let adminAuthenticated = false;
         let connectionIntervalId = null;
+
+        // Terms and Conditions Modal Functions
+        window.openTermsModal = function() {
+            const modal = document.getElementById('termsModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        window.closeTermsModal = function() {
+            const modal = document.getElementById('termsModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        // Close modal when clicking outside the modal content
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('termsModal');
+            if (event.target === modal) {
+                closeTermsModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const termsModal = document.getElementById('termsModal');
+                const editPasswordModal = document.getElementById('editPasswordModal');
+                const addQuizModal = document.getElementById('addQuizModal');
+                
+                if (termsModal.classList.contains('active')) {
+                    closeTermsModal();
+                }
+                if (editPasswordModal.classList.contains('active')) {
+                    closeEditPasswordModal();
+                }
+                if (addQuizModal.classList.contains('active')) {
+                    closeAddQuizModal();
+                }
+                const viewQuizModal = document.getElementById('viewQuizModal');
+                if (viewQuizModal && viewQuizModal.classList.contains('active')) {
+                    closeViewQuizModal();
+                }
+            }
+        });
+
+        // Close edit password modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const editPasswordModal = document.getElementById('editPasswordModal');
+            if (event.target === editPasswordModal) {
+                closeEditPasswordModal();
+            }
+        });
+
+        // Close add quiz modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const addQuizModal = document.getElementById('addQuizModal');
+            if (event.target === addQuizModal) {
+                closeAddQuizModal();
+            }
+        });
+
+        // Close view quiz modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const viewQuizModal = document.getElementById('viewQuizModal');
+            if (event.target === viewQuizModal) {
+                closeViewQuizModal();
+            }
+        });
 
         // Make Firebase available globally
         window.firebaseAuth = auth;
@@ -916,6 +1859,7 @@
             const navItems = document.querySelectorAll('.nav-item');
             const sections = document.querySelectorAll('.content-section');
 
+            // Update navigation items
             navItems.forEach(item => {
                 const target = item.getAttribute('data-section');
                 if (target === sectionId) {
@@ -925,15 +1869,38 @@
                 }
             });
 
+            // Update content sections with smooth transition
             sections.forEach(section => {
                 const id = section.getAttribute('id');
                 const mappedId = `${sectionId}Section`;
+                
                 if (id === mappedId) {
+                    // Show the target section
+                    section.style.display = 'flex';
                     section.classList.remove('hidden');
+                    
+                    // Force reflow to ensure the element is visible before transition
+                    section.offsetHeight;
+                    
+                    // Add a small delay to ensure smooth transition
+                    setTimeout(() => {
+                        section.style.opacity = '1';
+                        section.style.transform = 'translateX(0)';
+                    }, 10);
                 } else {
-                    section.classList.add('hidden');
+                    // Hide other sections
+                    section.style.opacity = '0';
+                    section.style.transform = 'translateX(20px)';
+                    
+                    setTimeout(() => {
+                        section.classList.add('hidden');
+                        section.style.display = 'none';
+                    }, 300);
                 }
             });
+
+            // Store current section in localStorage for persistence
+            localStorage.setItem('currentSection', sectionId);
         }
 
         function handleAdminLogin(e) {
@@ -941,6 +1908,13 @@
 
             const username = document.getElementById('adminUsername').value.trim();
             const password = document.getElementById('adminPassword').value;
+            const termsCheckbox = document.getElementById('adminTermsCheckbox');
+
+            // Check if terms and conditions are accepted
+            if (!termsCheckbox.checked) {
+                showLoginMessage('Please accept the Terms and Conditions to continue.', 'error');
+                return;
+            }
 
             if (username.toLowerCase() !== ADMIN_USERNAME.toLowerCase()) {
                 showLoginMessage('Invalid username. Please try again.', 'error');
@@ -963,7 +1937,23 @@
                 loginContainer.classList.add('hidden');
                 registrationContainer.classList.remove('hidden');
                 connectionStatus.classList.remove('hidden');
-                updateSidebarState('dashboard');
+                
+                // Initialize with saved section or default to dashboard
+                const savedSection = localStorage.getItem('currentSection') || 'dashboard';
+                updateSidebarState(savedSection);
+                
+                // Load recently created accounts from Firebase
+                loadRecentlyCreatedAccounts();
+                
+                // Load all students for Students tab
+                loadAllStudents();
+                
+                // Load leaderboard data
+                loadLeaderboard();
+                
+                // Load quizzes
+                loadQuizzes();
+                
                 checkDatabaseConnection();
                 if (connectionIntervalId) {
                     clearInterval(connectionIntervalId);
@@ -1029,6 +2019,12 @@
                 
                 showMessage('Account created successfully! Welcome to MatheMahika!', 'success');
                 
+                // Refresh the recently created accounts table
+                loadRecentlyCreatedAccounts();
+                
+                // Refresh the all students table
+                loadAllStudents();
+                
                 // Reset form after success
                 setTimeout(() => {
                     resetForm();
@@ -1072,12 +2068,1026 @@
             document.getElementById('message').style.display = 'none';
         }
 
+        // Account management functions
+        window.toggleSelectAll = function(checkbox) {
+            const checkboxes = document.querySelectorAll('.account-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = checkbox.checked;
+            });
+            updateDeleteButton();
+        }
+
+        window.updateDeleteButton = function() {
+            const checkboxes = document.querySelectorAll('.account-checkbox:checked');
+            const deleteBtn = document.getElementById('deleteSelectedBtn');
+            const countSpan = document.getElementById('selectedCount');
+            
+            if (checkboxes.length > 0) {
+                deleteBtn.style.display = 'block';
+                countSpan.textContent = checkboxes.length;
+            } else {
+                deleteBtn.style.display = 'none';
+                countSpan.textContent = '0';
+            }
+
+            // Update "Select All" checkbox state
+            const allCheckboxes = document.querySelectorAll('.account-checkbox');
+            const selectAllCheckbox = document.getElementById('selectAllAccounts');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = checkboxes.length === allCheckboxes.length && allCheckboxes.length > 0;
+            }
+        }
+
+        window.deleteSelectedAccounts = async function() {
+            const checkboxes = document.querySelectorAll('.account-checkbox:checked');
+            const accountIds = Array.from(checkboxes).map(cb => cb.getAttribute('data-account-id'));
+            
+            if (accountIds.length === 0) return;
+
+            const confirmMsg = `Are you sure you want to delete ${accountIds.length} selected account(s)? This action cannot be undone.`;
+            if (confirm(confirmMsg)) {
+                try {
+                    // Delete all selected accounts from Firebase
+                    const deletePromises = accountIds.map(async (accountId) => {
+                        const userRef = ref(database, 'users/' + accountId);
+                        await set(userRef, null);
+                    });
+                    
+                    await Promise.all(deletePromises);
+
+                    // Reset the select all checkbox and hide delete button
+                    const selectAllCheckbox = document.getElementById('selectAllAccounts');
+                    if (selectAllCheckbox) selectAllCheckbox.checked = false;
+                    
+                    // Refresh the tables
+                    loadRecentlyCreatedAccounts();
+                    loadAllStudents();
+                    updateDeleteButton();
+
+                    // Show success message
+                    alert(`Successfully deleted ${accountIds.length} account(s) from Firebase`);
+                } catch (error) {
+                    console.error('Error deleting accounts:', error);
+                    alert('Failed to delete some accounts. Please try again.');
+                }
+            }
+        }
+
+        window.deleteAccount = async function(accountId) {
+            const confirmMsg = 'Are you sure you want to delete this account? This action cannot be undone.';
+            if (confirm(confirmMsg)) {
+                try {
+                    // Delete from Firebase Database
+                    const userRef = ref(database, 'users/' + accountId);
+                    await set(userRef, null); // Setting to null deletes the entry
+                    
+                    // Refresh the tables
+                    loadRecentlyCreatedAccounts();
+                    loadAllStudents();
+                    updateDeleteButton();
+                    alert('Account deleted successfully from Firebase');
+                } catch (error) {
+                    console.error('Error deleting account:', error);
+                    alert('Failed to delete account. Please try again.');
+                }
+            }
+        }
+
+        // Store current student being edited
+        let currentEditingStudentId = null;
+
+        window.editAccountDetails = function(accountId) {
+            currentEditingStudentId = accountId;
+            
+            // Get student name from the table row
+            const checkbox = document.querySelector(`.account-checkbox[data-account-id="${accountId}"]`);
+            if (checkbox) {
+                const row = checkbox.closest('tr');
+                const nameCell = row.querySelector('td:nth-child(2)'); // Full Name column
+                const studentName = nameCell ? nameCell.textContent : 'Student';
+                
+                // Update modal with student name
+                document.getElementById('editStudentName').textContent = studentName;
+            }
+            
+            // Reset form and open modal
+            document.getElementById('editPasswordForm').reset();
+            document.getElementById('editPasswordMessage').style.display = 'none';
+            openEditPasswordModal();
+        }
+
+        window.openEditPasswordModal = function() {
+            const modal = document.getElementById('editPasswordModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        window.closeEditPasswordModal = function() {
+            const modal = document.getElementById('editPasswordModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+            currentEditingStudentId = null;
+        }
+
+        window.saveNewPassword = function(event) {
+            event.preventDefault();
+            
+            const newPassword = document.getElementById('newStudentPassword').value;
+            const confirmPassword = document.getElementById('confirmStudentPassword').value;
+            const messageDiv = document.getElementById('editPasswordMessage');
+            
+            // Validate passwords match
+            if (newPassword !== confirmPassword) {
+                messageDiv.textContent = 'Passwords do not match!';
+                messageDiv.className = 'message error';
+                messageDiv.style.display = 'block';
+                return;
+            }
+            
+            // Validate password length
+            if (newPassword.length < 6) {
+                messageDiv.textContent = 'Password must be at least 6 characters long!';
+                messageDiv.className = 'message error';
+                messageDiv.style.display = 'block';
+                return;
+            }
+            
+            // Show loading state
+            const saveBtn = document.getElementById('savePasswordBtn');
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = 'Saving...';
+            saveBtn.disabled = true;
+            
+            // Simulate API call (in production, this would update Firebase Auth and Database)
+            setTimeout(() => {
+                // Success
+                messageDiv.textContent = 'Password updated successfully!';
+                messageDiv.className = 'message success';
+                messageDiv.style.display = 'block';
+                
+                // Reset button
+                saveBtn.textContent = originalText;
+                saveBtn.disabled = false;
+                
+                // Close modal after 1.5 seconds
+                setTimeout(() => {
+                    closeEditPasswordModal();
+                    alert(`Password updated successfully for student ID: ${currentEditingStudentId}\n\nIn production, this would:\n- Update Firebase Authentication\n- Update student record in database\n- Send confirmation email to student`);
+                }, 1500);
+            }, 1000);
+        }
+
+        // Toggle password visibility
+        let passwordVisible = false;
+        window.togglePasswordVisibility = function() {
+            const passwordDisplay = document.getElementById('adminPasswordDisplay');
+            const toggleButton = event.target;
+            
+            if (passwordVisible) {
+                passwordDisplay.textContent = '••••••';
+                toggleButton.textContent = '👁️';
+                toggleButton.title = 'Show password';
+                passwordVisible = false;
+            } else {
+                passwordDisplay.textContent = ADMIN_PASSWORD;
+                toggleButton.textContent = '🙈';
+                toggleButton.title = 'Hide password';
+                passwordVisible = true;
+            }
+        }
+
+        // Quiz Management Functions
+        let questionCounter = 0;
+
+        window.openAddQuizModal = function() {
+            const modal = document.getElementById('addQuizModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Reset form
+            document.getElementById('addQuizForm').reset();
+            document.getElementById('questionsContainer').innerHTML = '';
+            document.getElementById('operationGroup').style.display = 'none';
+            questionCounter = 0;
+            
+            // Add initial question row
+            addQuestionRow();
+        }
+
+        window.closeAddQuizModal = function() {
+            const modal = document.getElementById('addQuizModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+            
+            // Clear message
+            const messageDiv = document.getElementById('addQuizMessage');
+            messageDiv.style.display = 'none';
+        }
+
+        window.updateOperationOptions = function() {
+            const quizType = document.getElementById('quizType').value;
+            const operationGroup = document.getElementById('operationGroup');
+            const operationSelect = document.getElementById('quizOperation');
+            const questionsContainer = document.getElementById('questionsContainer');
+            
+            if (quizType === 'clawmachine') {
+                // Show operation selector for Claw Machine
+                operationGroup.style.display = 'block';
+                operationSelect.required = true;
+                
+                // Update all question rows to disable operator selection
+                updateQuestionRowsForClawMachine();
+            } else if (quizType === 'openworld') {
+                // Hide operation selector for Open World
+                operationGroup.style.display = 'none';
+                operationSelect.required = false;
+                operationSelect.value = '';
+                
+                // Update all question rows to enable operator selection
+                updateQuestionRowsForOpenWorld();
+            } else {
+                operationGroup.style.display = 'none';
+                operationSelect.required = false;
+            }
+        }
+
+        window.addQuestionRow = function() {
+            const quizType = document.getElementById('quizType').value;
+            const selectedOperation = document.getElementById('quizOperation').value;
+            const container = document.getElementById('questionsContainer');
+            
+            questionCounter++;
+            const questionId = `question_${questionCounter}`;
+            
+            const questionRow = document.createElement('div');
+            questionRow.className = 'question-row';
+            questionRow.id = questionId;
+            
+            let operatorHTML = '';
+            if (quizType === 'clawmachine' && selectedOperation) {
+                // Fixed operator based on selected operation
+                const operators = {
+                    'addition': '+',
+                    'subtraction': '-',
+                    'multiplication': '×',
+                    'division': '÷'
+                };
+                operatorHTML = `<input type="text" value="${operators[selectedOperation]}" readonly style="text-align: center; font-weight: 600; background-color: rgba(102, 126, 234, 0.1);">`;
+            } else if (quizType === 'openworld') {
+                // Dropdown for mixed operations
+                operatorHTML = `
+                    <select class="operator-select" name="operator_${questionCounter}" required>
+                        <option value="+">+</option>
+                        <option value="-">-</option>
+                        <option value="×">×</option>
+                        <option value="÷">÷</option>
+                    </select>
+                `;
+            } else {
+                operatorHTML = `<input type="text" placeholder="Op" readonly style="text-align: center; background-color: #f0f0f0;">`;
+            }
+            
+            questionRow.innerHTML = `
+                <input type="number" placeholder="First number" name="num1_${questionCounter}" required>
+                ${operatorHTML}
+                <input type="number" placeholder="Second number" name="num2_${questionCounter}" required>
+                <span style="text-align: center; font-weight: 600; font-size: 18px;">=</span>
+                <input type="number" placeholder="Answer" name="answer_${questionCounter}" required>
+                <button type="button" class="remove-btn" onclick="removeQuestionRow('${questionId}')" title="Remove question">×</button>
+            `;
+            
+            container.appendChild(questionRow);
+        }
+
+        window.removeQuestionRow = function(questionId) {
+            const row = document.getElementById(questionId);
+            if (row) {
+                row.remove();
+            }
+        }
+
+        function updateQuestionRowsForClawMachine() {
+            const selectedOperation = document.getElementById('quizOperation').value;
+            const operators = {
+                'addition': '+',
+                'subtraction': '-',
+                'multiplication': '×',
+                'division': '÷'
+            };
+            
+            const rows = document.querySelectorAll('.question-row');
+            rows.forEach(row => {
+                const operatorElement = row.children[1]; // Second element is operator
+                if (selectedOperation && operators[selectedOperation]) {
+                    operatorElement.outerHTML = `<input type="text" value="${operators[selectedOperation]}" readonly style="text-align: center; font-weight: 600; background-color: rgba(102, 126, 234, 0.1);">`;
+                }
+            });
+        }
+
+        function updateQuestionRowsForOpenWorld() {
+            const rows = document.querySelectorAll('.question-row');
+            rows.forEach((row, index) => {
+                const operatorElement = row.children[1];
+                const questionNum = index + 1;
+                operatorElement.outerHTML = `
+                    <select class="operator-select" name="operator_${questionNum}" required>
+                        <option value="+">+</option>
+                        <option value="-">-</option>
+                        <option value="×">×</option>
+                        <option value="÷">÷</option>
+                    </select>
+                `;
+            });
+        }
+
+        window.saveQuiz = async function(event) {
+            event.preventDefault();
+            
+            const quizName = document.getElementById('quizName').value.trim();
+            const quizType = document.getElementById('quizType').value;
+            const operation = document.getElementById('quizOperation').value;
+            const attempts = parseInt(document.getElementById('quizAttempts').value);
+            const scorePerQuestion = parseInt(document.getElementById('quizScore').value);
+            const timeLimit = parseInt(document.getElementById('quizTimeLimit').value);
+            const deadline = document.getElementById('quizDeadline').value;
+            const container = document.getElementById('questionsContainer');
+            const questionRows = container.querySelectorAll('.question-row');
+            
+            if (questionRows.length === 0) {
+                showQuizMessage('Please add at least one question.', 'error');
+                return;
+            }
+            
+            // Collect all questions
+            const questions = [];
+            questionRows.forEach((row, index) => {
+                const inputs = row.querySelectorAll('input[type="number"]');
+                const operatorElement = row.children[1];
+                
+                let operator = '';
+                if (quizType === 'clawmachine') {
+                    operator = operatorElement.value;
+                } else if (quizType === 'openworld') {
+                    operator = operatorElement.value;
+                }
+                
+                questions.push({
+                    num1: parseInt(inputs[0].value),
+                    operator: operator,
+                    num2: parseInt(inputs[1].value),
+                    answer: parseInt(inputs[2].value)
+                });
+            });
+            
+            // Create quiz object
+            const quiz = {
+                name: quizName,
+                type: quizType,
+                operation: quizType === 'clawmachine' ? operation : 'mixed',
+                attempts: attempts,
+                scorePerQuestion: scorePerQuestion,
+                timeLimit: timeLimit,
+                deadline: deadline,
+                questions: questions,
+                createdAt: new Date().toISOString(),
+                questionCount: questions.length,
+                studentResults: {} // Will store student results
+            };
+            
+            try {
+                // Save to Firebase
+                const quizId = 'quiz_' + Date.now();
+                await set(ref(database, 'quizzes/' + quizId), quiz);
+                
+                showQuizMessage('Quiz created successfully!', 'success');
+                
+                // Refresh quiz list and close modal after short delay
+                setTimeout(() => {
+                    loadQuizzes();
+                    closeAddQuizModal();
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error saving quiz:', error);
+                showQuizMessage('Error creating quiz. Please try again.', 'error');
+            }
+        }
+
+        function showQuizMessage(message, type) {
+            const messageDiv = document.getElementById('addQuizMessage');
+            messageDiv.textContent = message;
+            messageDiv.className = type === 'success' ? 'message success' : 'message error';
+            messageDiv.style.display = 'block';
+        }
+
+        // Load and display all quizzes
+        async function loadQuizzes() {
+            try {
+                const quizzesRef = ref(database, 'quizzes');
+                const snapshot = await get(quizzesRef);
+                
+                const tableBody = document.getElementById('quizzesTableBody');
+                
+                if (!snapshot.exists()) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px; color: #6c7aa0;">
+                                No quizzes found. Click "Add Quiz" to create your first quiz!
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                const quizzes = [];
+                snapshot.forEach((childSnapshot) => {
+                    const quizData = childSnapshot.val();
+                    quizzes.push({
+                        id: childSnapshot.key,
+                        ...quizData
+                    });
+                });
+                
+                // Sort by creation date (newest first)
+                quizzes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                // Render quizzes
+                tableBody.innerHTML = quizzes.map(quiz => {
+                    const typeIcon = quiz.type === 'openworld' ? '🌍' : '🎮';
+                    const typeName = quiz.type === 'openworld' ? 'Open World' : 'Claw Machine';
+                    const operationName = quiz.operation === 'mixed' ? 'Mixed Operations' : 
+                                         quiz.operation.charAt(0).toUpperCase() + quiz.operation.slice(1);
+                    const date = new Date(quiz.createdAt).toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                    });
+                    
+                    return `
+                        <tr>
+                            <td><strong>${quiz.name || 'Untitled Quiz'}</strong></td>
+                            <td>${typeIcon} ${typeName}</td>
+                            <td>${operationName}</td>
+                            <td>${quiz.questionCount} questions</td>
+                            <td>${quiz.attempts || 3}</td>
+                            <td>${date}</td>
+                            <td>
+                                <div class="user-row-actions">
+                                    <button class="small-btn" onclick="viewQuiz('${quiz.id}')">👁️ View</button>
+                                    <button class="small-btn" onclick="editQuiz('${quiz.id}')">✏️ Edit</button>
+                                    <button class="small-btn" onclick="deleteQuiz('${quiz.id}')">🗑️ Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading quizzes:', error);
+            }
+        }
+
+        // View quiz details
+        window.viewQuiz = async function(quizId) {
+            try {
+                const quizRef = ref(database, 'quizzes/' + quizId);
+                const snapshot = await get(quizRef);
+                
+                if (snapshot.exists()) {
+                    const quiz = snapshot.val();
+                    
+                    const typeIcon = quiz.type === 'openworld' ? '🌍' : '🎮';
+                    const typeName = quiz.type === 'openworld' ? 'Open World' : 'Claw Machine';
+                    const operationName = quiz.operation === 'mixed' ? 'Mixed Operations' : 
+                                         quiz.operation.charAt(0).toUpperCase() + quiz.operation.slice(1);
+                    
+                    // Set modal title
+                    document.getElementById('viewQuizTitle').textContent = `📝 ${quiz.name || 'Untitled Quiz'}`;
+                    
+                    // Set quiz problems
+                    const problemsHTML = quiz.questions.map((q, i) => `
+                        <div class="problem-item">
+                            <div class="problem-number">${i + 1}</div>
+                            <div class="problem-equation">${q.num1} ${q.operator} ${q.num2} = ${q.answer}</div>
+                        </div>
+                    `).join('');
+                    document.getElementById('viewQuizProblems').innerHTML = problemsHTML;
+                    
+                    // Load and display student results
+                    const studentResultsTableBody = document.getElementById('viewQuizStudentsTableBody');
+                    
+                    if (quiz.studentResults && Object.keys(quiz.studentResults).length > 0) {
+                        const resultsHTML = await Promise.all(
+                            Object.entries(quiz.studentResults).map(async ([studentId, result]) => {
+                                // Fetch student name from users
+                                const userRef = ref(database, 'users/' + studentId);
+                                const userSnapshot = await get(userRef);
+                                const studentName = userSnapshot.exists() ? 
+                                    (userSnapshot.val().fullname || userSnapshot.val().username || 'Unknown Student') : 
+                                    'Unknown Student';
+                                
+                                // Calculate total possible score
+                                const totalPossibleScore = quiz.questionCount * (quiz.scorePerQuestion || 5);
+                                
+                                // Calculate correct and incorrect answers
+                                const correctAnswers = result.correct || Math.round((result.accuracy / 100) * result.answered);
+                                const incorrectAnswers = result.answered - correctAnswers;
+                                
+                                // Format time taken (convert seconds to minutes:seconds)
+                                const minutes = Math.floor(result.timeTaken / 60);
+                                const seconds = result.timeTaken % 60;
+                                const timeFormatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                                
+                                return `
+                                    <tr>
+                                        <td>${studentName}</td>
+                                        <td><strong style="color: #667eea;">${result.score}/${totalPossibleScore}</strong></td>
+                                        <td><span style="color: #10b981; font-weight: 600;">${correctAnswers}</span></td>
+                                        <td><span style="color: #ef4444; font-weight: 600;">${incorrectAnswers}</span></td>
+                                        <td>${timeFormatted}</td>
+                                        <td>${result.answered}/${quiz.questionCount}</td>
+                                    </tr>
+                                `;
+                            })
+                        );
+                        studentResultsTableBody.innerHTML = resultsHTML.join('');
+                    } else {
+                        studentResultsTableBody.innerHTML = `
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 20px; color: #6c7aa0;">
+                                    No students have taken this quiz yet.
+                                </td>
+                            </tr>
+                        `;
+                    }
+                    
+                    // Open modal
+                    const modal = document.getElementById('viewQuizModal');
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            } catch (error) {
+                console.error('Error viewing quiz:', error);
+                alert('Error loading quiz details.');
+            }
+        }
+
+        // Close view quiz modal
+        window.closeViewQuizModal = function() {
+            const modal = document.getElementById('viewQuizModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Edit quiz (placeholder)
+        window.editQuiz = function(quizId) {
+            alert(`Edit functionality for quiz ${quizId} will be implemented.\n\nThis will allow you to modify existing questions and quiz settings.`);
+        }
+
+        // Delete quiz
+        window.deleteQuiz = async function(quizId) {
+            if (!confirm('Are you sure you want to delete this quiz? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const quizRef = ref(database, 'quizzes/' + quizId);
+                await set(quizRef, null);
+                
+                alert('Quiz deleted successfully!');
+                loadQuizzes();
+            } catch (error) {
+                console.error('Error deleting quiz:', error);
+                alert('Error deleting quiz. Please try again.');
+            }
+        }
+
+        // Initialize admin credentials display
+        function initializeAdminDisplay() {
+            const usernameDisplay = document.getElementById('adminUsernameDisplay');
+            if (usernameDisplay) {
+                usernameDisplay.textContent = ADMIN_USERNAME;
+            }
+        }
+
+        // Fetch and display all created accounts from Firebase
+        async function loadRecentlyCreatedAccounts() {
+            try {
+                const usersRef = ref(database, 'users');
+                const snapshot = await get(usersRef);
+                
+                if (snapshot.exists()) {
+                    const users = [];
+                    snapshot.forEach((childSnapshot) => {
+                        const userData = childSnapshot.val();
+                        const userId = childSnapshot.key;
+                        
+                        // Only include non-admin users
+                        if (!userData.isAdmin) {
+                            users.push({
+                                id: userId,
+                                fullname: userData.fullname || 'N/A',
+                                username: userData.username || 'N/A',
+                                email: userData.email || 'N/A',
+                                createdAt: userData.createdAt || new Date().toISOString(),
+                                score: userData.score || 0
+                            });
+                        }
+                    });
+                    
+                    // Sort by creation date (newest first)
+                    users.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    
+                    // Show ALL users (no limit)
+                    updateRecentAccountsTable(users);
+                } else {
+                    console.log('No users found in database');
+                    updateRecentAccountsTable([]);
+                }
+            } catch (error) {
+                console.error('Error loading recent accounts:', error);
+            }
+        }
+
+        // Update the Recently Created Accounts table
+        function updateRecentAccountsTable(users) {
+            const tableBody = document.getElementById('recentAccountsTableBody');
+            
+            if (users.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #6c7aa0;">
+                            No students registered yet. Create the first student account!
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tableBody.innerHTML = users.map((user, index) => {
+                const createdDate = new Date(user.createdAt);
+                const formattedDate = createdDate.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                });
+                
+                return `
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="account-checkbox" data-account-id="${user.id}" onchange="updateDeleteButton()" style="width: 18px; height: 18px; cursor: pointer; accent-color: #667eea;">
+                        </td>
+                        <td>${user.fullname}</td>
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                        <td>${formattedDate}</td>
+                        <td><span class="pill" style="background-color: rgba(34, 197, 94, 0.15); color: #15803d;">Active</span></td>
+                        <td>
+                            <div class="user-row-actions">
+                                <button class="small-btn" onclick="editAccountDetails('${user.id}')">✏️ Edit</button>
+                                <button class="small-btn" style="background-color: rgba(239, 68, 68, 0.12); color: #dc2626;" onclick="deleteAccount('${user.id}')">🗑️ Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Fetch and display ALL students in Students tab
+        async function loadAllStudents() {
+            try {
+                const usersRef = ref(database, 'users');
+                const snapshot = await get(usersRef);
+                
+                if (snapshot.exists()) {
+                    const students = [];
+                    snapshot.forEach((childSnapshot) => {
+                        const userData = childSnapshot.val();
+                        const userId = childSnapshot.key;
+                        
+                        // Only include non-admin users
+                        if (!userData.isAdmin) {
+                            students.push({
+                                id: userId,
+                                fullname: userData.fullname || 'N/A',
+                                username: userData.username || 'N/A',
+                                email: userData.email || 'N/A',
+                                cwHighScore: userData.CWHighScore || 0,
+                                opHighScore: userData.OPHighScore || 0,
+                                createdAt: userData.createdAt || new Date().toISOString()
+                            });
+                        }
+                    });
+                    
+                    // Sort by name alphabetically
+                    students.sort((a, b) => a.fullname.localeCompare(b.fullname));
+                    
+                    // Update the Students tab table
+                    updateAllStudentsTable(students);
+                    
+                    // Update dashboard statistics
+                    updateDashboardStats(students);
+                } else {
+                    console.log('No students found in database');
+                    updateAllStudentsTable([]);
+                    updateDashboardStats([]);
+                }
+            } catch (error) {
+                console.error('Error loading all students:', error);
+            }
+        }
+
+        // Update the All Students table (Students tab)
+        function updateAllStudentsTable(students) {
+            const tableBody = document.getElementById('studentsTableBody');
+            
+            if (students.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: #6c7aa0;">
+                            No students found. Register students in the Manage Account tab!
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tableBody.innerHTML = students.map((student) => {
+                return `
+                    <tr>
+                        <td>${student.fullname}</td>
+                        <td>${student.email}</td>
+                        <td>${student.cwHighScore}</td>
+                        <td>${student.opHighScore}</td>
+                        <td>
+                            <div class="user-row-actions">
+                                <button class="small-btn" onclick="viewStudent('${student.id}')">👁️ View</button>
+                                <button class="small-btn" onclick="archiveStudent('${student.id}')">📦 Archive</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Update dashboard statistics
+        function updateDashboardStats(students) {
+            const totalStudentsElement = document.getElementById('totalStudentsCount');
+            
+            if (totalStudentsElement) {
+                totalStudentsElement.textContent = students.length;
+            }
+        }
+
+        // View student details
+        window.viewStudent = function(studentId) {
+            alert(`View details for student ID: ${studentId}\n\nThis will show:\n- Full profile information\n- Score history\n- Activity logs\n- Performance metrics`);
+        }
+
+        // Archive student
+        window.archiveStudent = async function(studentId) {
+            const confirmMsg = 'Are you sure you want to archive this student? They will be moved to archived students.';
+            if (confirm(confirmMsg)) {
+                alert(`Student ${studentId} has been archived.\n\nIn production, this would:\n- Move student to archived collection\n- Maintain student data for records\n- Remove from active student list`);
+                // In production: update student status to archived in Firebase
+            }
+        }
+
+        // Leaderboard Logic (based on Unity LegacyLeaderboardManager)
+        let currentLeaderboardMode = 'CLAW MACHINE'; // 'CLAW MACHINE' or 'OPEN WORLD'
+        let currentMathFilter = ''; // For Claw Machine: '', 'Addition', 'Subtraction', 'Multiplication', 'Division'
+
+        async function loadLeaderboard() {
+            try {
+                const usersRef = ref(database, 'users');
+                const snapshot = await get(usersRef);
+                
+                const topUsers = [];
+                
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const userData = childSnapshot.val();
+                        const userId = childSnapshot.key;
+                        
+                        // Skip admin users
+                        if (userData.isAdmin) return;
+                        
+                        const username = userData.username || userData.fullname || 'Unknown';
+                        let bestScore = 0;
+                        
+                        if (currentLeaderboardMode === 'OPEN WORLD') {
+                            // OPEN WORLD = Mixed Operations only
+                            const mixedGames = userData.mixedOperationsGames;
+                            if (mixedGames) {
+                                Object.values(mixedGames).forEach(game => {
+                                    const gameScore = parseInt(game.finalScore) || 0;
+                                    bestScore = Math.max(bestScore, gameScore);
+                                });
+                            }
+                        } else {
+                            // CLAW MACHINE = Addition, Subtraction, Multiplication, Division
+                            const completedGames = userData.completedGames;
+                            if (completedGames) {
+                                Object.values(completedGames).forEach(game => {
+                                    const mathOp = game.mathOperation;
+                                    const gameScore = parseInt(game.finalScore) || 0;
+                                    
+                                    // Filter by math operation if specified
+                                    if (!currentMathFilter || mathOp === currentMathFilter) {
+                                        bestScore = Math.max(bestScore, gameScore);
+                                    }
+                                });
+                            }
+                            
+                            // Fallback to main score for "All" view in Claw Machine
+                            if (bestScore === 0 && !currentMathFilter) {
+                                bestScore = parseInt(userData.score) || 0;
+                            }
+                        }
+                        
+                        if (bestScore > 0) {
+                            topUsers.push({ username, bestScore });
+                        }
+                    });
+                }
+                
+                // Sort by best score (highest first) and take top 10
+                topUsers.sort((a, b) => b.bestScore - a.bestScore);
+                const top10 = topUsers.slice(0, 10);
+                
+                // Fill the leaderboard rows
+                fillLeaderboardRows(top10);
+                
+            } catch (error) {
+                console.error('Error loading leaderboard:', error);
+            }
+        }
+
+        function fillLeaderboardRows(users) {
+            const container = document.getElementById('leaderboardContainer');
+            container.innerHTML = '';
+            
+            // Define medal emojis for top 3
+            const medals = ['🥇', '🥈', '🥉'];
+            
+            // Create rows for top 10
+            for (let i = 0; i < 10; i++) {
+                const rank = i + 1;
+                const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-other';
+                const badge = rank <= 3 ? `${medals[i]} #${rank}` : `👤 #${rank}`;
+                
+                const username = i < users.length ? users[i].username : '---';
+                const score = i < users.length ? users[i].bestScore : '0';
+                
+                const rowHTML = `
+                    <div class="leaderboard-row ${rankClass}">
+                        <div class="rank-badge">${badge}</div>
+                        <div class="player-info">
+                            <div class="player-name">${username}</div>
+                            <div class="player-score">${score}</div>
+                        </div>
+                    </div>
+                `;
+                
+                container.innerHTML += rowHTML;
+            }
+        }
+
+        function updateFilterButtons() {
+            const filterButtonsContainer = document.getElementById('filterButtons');
+            
+            if (currentLeaderboardMode === 'OPEN WORLD') {
+                // Open World: No filters, just show info
+                filterButtonsContainer.innerHTML = `
+                    <div class="tag" style="background-color: rgba(118, 75, 162, 0.15); color: #764ba2; font-size: 14px;">
+                        🌍 Mixed operations
+                    </div>
+                `;
+            } else {
+                // Claw Machine: Show operation filters
+                filterButtonsContainer.innerHTML = `
+                    <button class="small-btn filter-btn active" onclick="filterLeaderboard('')">All</button>
+                    <button class="small-btn filter-btn" onclick="filterLeaderboard('Addition')">Addition</button>
+                    <button class="small-btn filter-btn" onclick="filterLeaderboard('Subtraction')">Subtraction</button>
+                    <button class="small-btn filter-btn" onclick="filterLeaderboard('Multiplication')">Multiplication</button>
+                    <button class="small-btn filter-btn" onclick="filterLeaderboard('Division')">Division</button>
+                `;
+            }
+        }
+
+        window.filterLeaderboard = function(mathOperation) {
+            currentMathFilter = mathOperation;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Reload leaderboard with new filter
+            loadLeaderboard();
+        }
+
+        window.toggleLeaderboardMode = function() {
+            if (currentLeaderboardMode === 'CLAW MACHINE') {
+                currentLeaderboardMode = 'OPEN WORLD';
+                currentMathFilter = ''; // Reset filter when switching modes
+                document.getElementById('leaderboardTitle').textContent = '🏆 OPEN WORLD Leaderboard';
+                document.getElementById('toggleModeText').textContent = 'Switch to CLAW MACHINE';
+            } else {
+                currentLeaderboardMode = 'CLAW MACHINE';
+                currentMathFilter = ''; // Reset filter when switching modes
+                document.getElementById('leaderboardTitle').textContent = '🏆 CLAW MACHINE Leaderboard';
+                document.getElementById('toggleModeText').textContent = 'Switch to OPEN WORLD';
+            }
+            
+            // Update filter buttons based on mode
+            updateFilterButtons();
+            
+            // Reload leaderboard for new mode
+            loadLeaderboard();
+        }
+
+        // Search users in Recently Created Accounts table
+        window.searchUsers = function() {
+            const searchInput = document.getElementById('userSearchInput');
+            const filter = searchInput.value.toLowerCase().trim();
+            const table = document.getElementById('recentAccountsTableBody');
+            const rows = table.getElementsByTagName('tr');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            const searchResults = document.getElementById('searchResults');
+            
+            let visibleCount = 0;
+            let totalCount = rows.length;
+
+            // Show/hide clear button
+            clearBtn.style.display = filter ? 'block' : 'none';
+
+            // Loop through all table rows
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let found = false;
+
+                if (cells.length > 0) {
+                    // Get text from Full Name (index 1), Username (index 2), and Email (index 3)
+                    const fullName = cells[1]?.textContent || '';
+                    const username = cells[2]?.textContent || '';
+                    const email = cells[3]?.textContent || '';
+
+                    // Check if search term matches any field
+                    if (fullName.toLowerCase().includes(filter) || 
+                        username.toLowerCase().includes(filter) || 
+                        email.toLowerCase().includes(filter)) {
+                        found = true;
+                    }
+                }
+
+                // Show or hide row based on search
+                if (found || filter === '') {
+                    rows[i].style.display = '';
+                    visibleCount++;
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+
+            // Update search results text
+            if (filter) {
+                if (visibleCount === 0) {
+                    searchResults.textContent = `No users found matching "${filter}"`;
+                    searchResults.style.color = '#dc2626';
+                } else if (visibleCount === totalCount) {
+                    searchResults.textContent = `Showing all ${totalCount} users`;
+                    searchResults.style.color = '#6c7aa0';
+                } else {
+                    searchResults.textContent = `Found ${visibleCount} of ${totalCount} users`;
+                    searchResults.style.color = '#15803d';
+                }
+            } else {
+                searchResults.textContent = '';
+            }
+
+            // Update the select all checkbox and delete button based on visible rows
+            updateDeleteButton();
+        }
+
+        // Clear search
+        window.clearSearch = function() {
+            const searchInput = document.getElementById('userSearchInput');
+            searchInput.value = '';
+            searchUsers();
+            searchInput.focus();
+        }
+
         // Make functions globally available
         window.handleRegistration = handleRegistration;
         window.resetForm = resetForm;
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize admin credentials display
+            initializeAdminDisplay();
+            
             // Set up admin login submission
             const adminLoginForm = document.getElementById('adminLoginForm');
             adminLoginForm.addEventListener('submit', handleAdminLogin);
@@ -1094,6 +3104,12 @@
                     updateSidebarState(section);
                 });
             });
+
+            // Restore last viewed section if available
+            const savedSection = localStorage.getItem('currentSection');
+            if (savedSection && adminAuthenticated) {
+                updateSidebarState(savedSection);
+            }
 
             const logoutBtn = document.getElementById('logoutBtn');
             logoutBtn.addEventListener('click', () => {
