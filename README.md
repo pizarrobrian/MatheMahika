@@ -6,12 +6,12 @@ MatheMahika
 1. CREATE NEW FILE NAMED 'admin-config.js'
 
 2. Enter the code in 'admin-config.js'
-
+```js
 export const adminConfig = {
     username: '',
     password: ''
 };
-
+```
 3. CREATE NEW FILE NAMED 'firebase-config.js'
 
 4. Enter the code in 'firebase-config.js'
