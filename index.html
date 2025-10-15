@@ -1112,7 +1112,11 @@
                         <select id="quizType" name="quizType" required onchange="updateOperationOptions()">
                             <option value="">-- Select Quiz Type --</option>
                             <option value="openworld">🌍 Open World (Mixed Operations)</option>
-                            <option value="clawmachine">🎮 Claw Machine (Single Operation)</option>
+                            <option value="claw_addition">🎯 Claw Machine - Addition</option>
+                            <option value="claw_subtraction">🎯 Claw Machine - Subtraction</option>
+                            <option value="claw_multiplication">🎯 Claw Machine - Multiplication</option>
+                            <option value="claw_division">🎯 Claw Machine - Division</option>
+                            <option value="clawmachine">🎮 Claw Machine (Legacy - Manual Operation)</option>
                         </select>
                     </div>
 
@@ -1267,7 +1271,10 @@
                         <select id="editQuizType" name="editQuizType" required onchange="updateEditOperationOptions()">
                             <option value="">-- Select Quiz Type --</option>
                             <option value="openworld">🌍 Open World (Mixed Operations)</option>
-                            <option value="clawmachine">🎮 Claw Machine (Single Operation)</option>
+                            <option value="claw_addition">🎯 Claw Machine - Addition</option>
+                            <option value="claw_subtraction">🎯 Claw Machine - Subtraction</option>
+                            <option value="claw_multiplication">🎯 Claw Machine - Multiplication</option>
+                            <option value="claw_division">🎯 Claw Machine - Division</option>
                         </select>
                     </div>
 
@@ -1607,7 +1614,7 @@
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
                                 <div style="padding: 16px; background: rgba(102, 126, 234, 0.08); border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.1);">
                                     <h4 style="margin: 0 0 8px 0; color: #323f90; font-size: 16px;">🎮 Interactive Games</h4>
-                                    <p style="margin: 0; font-size: 14px; color: #4a5568;">Claw Machine and Open World games for different math operations</p>
+                                    <p style="margin: 0; font-size: 14px; color: #4a5568;">Focused Claw Machine scenes tied to Firebase quiz types (e.g., Addition → claw_addition) and Open World mixed-operation adventures.</p>
                                 </div>
                                 <div style="padding: 16px; background: rgba(102, 126, 234, 0.08); border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.1);">
                                     <h4 style="margin: 0 0 8px 0; color: #323f90; font-size: 16px;">🧠 Custom Quizzes</h4>
@@ -1633,12 +1640,12 @@
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                                 <div style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; color: white;">
                                     <h4 style="margin: 0 0 12px 0; font-size: 18px;">🎮 Claw Machine</h4>
-                                    <p style="margin: 0 0 12px 0; opacity: 0.9;">Focused practice on single math operations</p>
+                                    <p style="margin: 0 0 12px 0; opacity: 0.9;">Scene-specific quizzes pulled by Firebase type (set quiz type to claw_addition, claw_subtraction, claw_multiplication, or claw_division).</p>
                                     <ul style="margin: 0; padding-left: 16px; opacity: 0.9;">
-                                        <li>Addition</li>
-                                        <li>Subtraction</li>
-                                        <li>Multiplication</li>
-                                        <li>Division</li>
+                                        <li>Addition → claw_addition</li>
+                                        <li>Subtraction → claw_subtraction</li>
+                                        <li>Multiplication → claw_multiplication</li>
+                                        <li>Division → claw_division</li>
                                     </ul>
                                 </div>
                                 <div style="padding: 20px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 12px; color: white;">
@@ -1991,14 +1998,12 @@
     <script type="module">
         // Import Firebase modules
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js';
-        import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js';
-        import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js';
+        import { getDatabase, ref, set, get, push, query, orderByChild, equalTo } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js';
         import { firebaseConfig } from './firebase-config.js';
         import { adminConfig } from './admin-config.js';
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const database = getDatabase(app);
 
         // Admin credentials (update password as needed)
@@ -2101,9 +2106,7 @@
         });
 
         // Make Firebase available globally
-        window.firebaseAuth = auth;
         window.firebaseDatabase = database;
-        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
         window.ref = ref;
         window.set = set;
         window.get = get;
@@ -2310,10 +2313,14 @@
             submitBtn.disabled = true;
             
             try {
-                // Create Firebase Auth account
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                
+                // Enforce unique username
+                const usernameQuery = query(ref(database, 'users'), orderByChild('username'), equalTo(username));
+                const usernameSnapshot = await get(usernameQuery);
+                if (usernameSnapshot.exists()) {
+                    showMessage('Username is already taken. Please choose another.', 'error');
+                    return;
+                }
+
                 // Prepare user data
                 const userData = {
                     username: username,
@@ -2324,11 +2331,14 @@
                     OPHighScore: 0,
                     createdAt: new Date().toISOString(),
                     lastLogin: new Date().toISOString(),
-                    isAdmin: false
+                    isAdmin: false,
+                    password: password,
+                    passwordUpdatedAt: new Date().toISOString()
                 };
                 
                 // Save user data to Firebase Database
-                await set(ref(database, 'users/' + sanitizePath(user.uid)), userData);
+                const newUserRef = push(ref(database, 'users'));
+                await set(newUserRef, userData);
                 
                 showMessage('Account created successfully! Welcome to MatheMahika!', 'success');
                 
@@ -2570,6 +2580,158 @@
         }
 
         // Quiz Management Functions
+        const CLAW_MACHINE_OPERATIONS = {
+            'claw_addition': 'addition',
+            'claw_subtraction': 'subtraction',
+            'claw_multiplication': 'multiplication',
+            'claw_division': 'division'
+        };
+
+        const OPERATION_SYMBOLS = {
+            'addition': '+',
+            'subtraction': '-',
+            'multiplication': '×',
+            'division': '÷'
+        };
+
+        function isSpecificClawMachineType(type) {
+            return !!CLAW_MACHINE_OPERATIONS[type];
+        }
+
+        function isClawMachineType(type) {
+            return type === 'clawmachine' || isSpecificClawMachineType(type);
+        }
+
+        function getClawOperationFromType(type) {
+            return CLAW_MACHINE_OPERATIONS[type] || '';
+        }
+
+        function getOperationSymbol(operation) {
+            return OPERATION_SYMBOLS[operation] || '';
+        }
+
+        function formatQuizTypeLabel(type) {
+            if (type === 'openworld') {
+                return 'Open World';
+            }
+            if (type === 'clawmachine') {
+                return 'Claw Machine';
+            }
+            if (isSpecificClawMachineType(type)) {
+                const operation = getClawOperationFromType(type);
+                return `Claw Machine - ${operation.charAt(0).toUpperCase()}${operation.slice(1)}`;
+            }
+            return type || 'Unknown';
+        }
+
+        function resolveOperationValue(quizType, selectedOperation) {
+            if (quizType === 'openworld') {
+                return 'mixed';
+            }
+            if (isSpecificClawMachineType(quizType)) {
+                return getClawOperationFromType(quizType);
+            }
+            if (quizType === 'clawmachine') {
+                return selectedOperation;
+            }
+            return selectedOperation || 'mixed';
+        }
+
+        function getQuizResultsPath(quizId, quiz) {
+            if (quiz && quiz.resultsPath) {
+                return `quizResults/${quiz.resultsPath}`;
+            }
+
+            const operationKey = quiz && quiz.operation && quiz.operation !== 'mixed'
+                ? quiz.operation.toLowerCase()
+                : null;
+            if (operationKey) {
+                return `quizResults/${operationKey}`;
+            }
+
+            const typeKey = quiz && quiz.type ? quiz.type.toLowerCase() : null;
+            if (typeKey) {
+                return `quizResults/${typeKey}`;
+            }
+
+            return `quizResults/${quizId}`;
+        }
+
+        async function fetchQuizResultsForQuiz(quizId, quiz) {
+            try {
+                const resultsPath = getQuizResultsPath(quizId, quiz);
+                const resultsRef = ref(database, resultsPath);
+                const snapshot = await get(resultsRef);
+
+                if (!snapshot.exists()) {
+                    return [];
+                }
+
+                const rows = [];
+                snapshot.forEach(childSnapshot => {
+                    const value = childSnapshot.val() || {};
+
+                    if (value.quizId && value.quizId !== quizId) {
+                        return;
+                    }
+
+                    const answered = Number.isFinite(value.answered) ? value.answered : ((Number(value.correct) || 0) + (Number(value.incorrect) || 0));
+                    const correct = Number(value.correct) || 0;
+                    const incorrect = Number(value.incorrect) || Math.max(0, answered - correct);
+
+                    rows.push({
+                        id: childSnapshot.key,
+                        fullName: value.fullName || value.studentName || value.username || 'Unknown Student',
+                        username: value.username || null,
+                        score: Number(value.score) || 0,
+                        correct,
+                        incorrect,
+                        answered,
+                        timeSeconds: typeof value.timeSeconds === 'number' ? value.timeSeconds : (typeof value.timeTaken === 'number' ? value.timeTaken : null),
+                        timestampUtc: value.timestampUtc || value.completedAt || value.finishedAt || ''
+                    });
+                });
+
+                rows.sort((a, b) => {
+                    if (a.score !== b.score) {
+                        return b.score - a.score;
+                    }
+                    if (a.timeSeconds != null && b.timeSeconds != null && a.timeSeconds !== b.timeSeconds) {
+                        return a.timeSeconds - b.timeSeconds;
+                    }
+                    return (b.timestampUtc || '').localeCompare(a.timestampUtc || '');
+                });
+
+                return rows;
+            } catch (error) {
+                console.error('Failed to load quiz results:', error);
+                return [];
+            }
+        }
+
+        function formatDurationFromSeconds(seconds) {
+            if (typeof seconds !== 'number' || !isFinite(seconds)) {
+                return '—';
+            }
+            const totalSeconds = Math.max(0, Math.round(seconds));
+            const minutes = Math.floor(totalSeconds / 60);
+            const remainingSeconds = totalSeconds % 60;
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        function computeQuestionCount(quiz) {
+            if (!quiz) {
+                return 0;
+            }
+            if (Number.isFinite(quiz.questionCount)) {
+                return quiz.questionCount;
+            }
+            if (Array.isArray(quiz.questions)) {
+                return quiz.questions.length;
+            }
+            return 0;
+        }
+
         let questionCounter = 0;
 
         window.openAddQuizModal = function() {
@@ -2603,12 +2765,17 @@
             const operationSelect = document.getElementById('quizOperation');
             const questionsContainer = document.getElementById('questionsContainer');
             
-            if (quizType === 'clawmachine') {
-                // Show operation selector for Claw Machine
+            if (isSpecificClawMachineType(quizType)) {
+                // Hide the manual operation selector; operation comes from type
+                operationGroup.style.display = 'none';
+                operationSelect.required = false;
+                operationSelect.value = getClawOperationFromType(quizType);
+                updateQuestionRowsForSpecificClawMachine(quizType);
+            } else if (quizType === 'clawmachine') {
+                // Show operation selector for legacy Claw Machine
                 operationGroup.style.display = 'block';
                 operationSelect.required = true;
-                
-                // Update all question rows to disable operator selection
+                operationSelect.value = '';
                 updateQuestionRowsForClawMachine();
             } else if (quizType === 'openworld') {
                 // Hide operation selector for Open World
@@ -2626,7 +2793,7 @@
 
         window.addQuestionRow = function() {
             const quizType = document.getElementById('quizType').value;
-            const selectedOperation = document.getElementById('quizOperation').value;
+            let selectedOperation = document.getElementById('quizOperation').value;
             const container = document.getElementById('questionsContainer');
             
             questionCounter++;
@@ -2637,15 +2804,14 @@
             questionRow.id = questionId;
             
             let operatorHTML = '';
-            if (quizType === 'clawmachine' && selectedOperation) {
+            if (isSpecificClawMachineType(quizType)) {
+                selectedOperation = getClawOperationFromType(quizType);
+            }
+
+            if (isClawMachineType(quizType) && selectedOperation) {
                 // Fixed operator based on selected operation
-                const operators = {
-                    'addition': '+',
-                    'subtraction': '-',
-                    'multiplication': '×',
-                    'division': '÷'
-                };
-                operatorHTML = `<input type="text" value="${operators[selectedOperation]}" readonly style="text-align: center; font-weight: 600; background-color: rgba(102, 126, 234, 0.1);">`;
+                const symbol = getOperationSymbol(selectedOperation);
+                operatorHTML = `<input type="text" value="${symbol}" readonly style="text-align: center; font-weight: 600; background-color: rgba(102, 126, 234, 0.1);">`;
             } else if (quizType === 'openworld') {
                 // Dropdown for mixed operations
                 operatorHTML = `
@@ -2681,19 +2847,29 @@
 
         function updateQuestionRowsForClawMachine() {
             const selectedOperation = document.getElementById('quizOperation').value;
-            const operators = {
-                'addition': '+',
-                'subtraction': '-',
-                'multiplication': '×',
-                'division': '÷'
-            };
-            
             const rows = document.querySelectorAll('.question-row');
             rows.forEach(row => {
                 const operatorElement = row.children[1]; // Second element is operator
-                if (selectedOperation && operators[selectedOperation]) {
-                    operatorElement.outerHTML = `<input type="text" value="${operators[selectedOperation]}" readonly style="text-align: center; font-weight: 600; background-color: rgba(102, 126, 234, 0.1);">`;
+                if (selectedOperation) {
+                    const symbol = getOperationSymbol(selectedOperation);
+                    if (symbol) {
+                        operatorElement.outerHTML = `<input type="text" value="${symbol}" readonly style="text-align: center; font-weight: 600; background-color: rgba(102, 126, 234, 0.1);">`;
+                    }
                 }
+            });
+        }
+
+        function updateQuestionRowsForSpecificClawMachine(quizType) {
+            const operation = getClawOperationFromType(quizType);
+            const symbol = getOperationSymbol(operation);
+            if (!symbol) {
+                return;
+            }
+
+            const rows = document.querySelectorAll('.question-row');
+            rows.forEach(row => {
+                const operatorElement = row.children[1];
+                operatorElement.outerHTML = `<input type="text" value="${symbol}" readonly style="text-align: center; font-weight: 600; background-color: rgba(102, 126, 234, 0.1);">`;
             });
         }
 
@@ -2736,14 +2912,21 @@
             questionRows.forEach((row, index) => {
                 const inputs = row.querySelectorAll('input[type="number"]');
                 const operatorElement = row.children[1];
-                
+
                 let operator = '';
-                if (quizType === 'clawmachine') {
-                    operator = operatorElement.value;
-                } else if (quizType === 'openworld') {
+                if (isSpecificClawMachineType(quizType)) {
+                    operator = getOperationSymbol(getClawOperationFromType(quizType));
+                } else if (quizType === 'clawmachine' || quizType === 'openworld') {
                     operator = operatorElement.value;
                 }
-                
+
+                if (!operator) {
+                    const resolvedOp = resolveOperationValue(quizType, operation);
+                    if (resolvedOp && resolvedOp !== 'mixed') {
+                        operator = getOperationSymbol(resolvedOp);
+                    }
+                }
+
                 questions.push({
                     num1: parseInt(inputs[0].value),
                     operator: operator,
@@ -2756,7 +2939,7 @@
             const quiz = {
                 name: quizName,
                 type: quizType,
-                operation: quizType === 'clawmachine' ? operation : 'mixed',
+                operation: resolveOperationValue(quizType, operation),
                 attempts: attempts,
                 scorePerQuestion: scorePerQuestion,
                 timeLimit: timeLimit,
@@ -2826,8 +3009,9 @@
                 
                 // Render quizzes
                 tableBody.innerHTML = quizzes.map(quiz => {
+                    const formattedType = formatQuizTypeLabel(quiz.type);
                     const typeIcon = quiz.type === 'openworld' ? '🌍' : '🎮';
-                    const typeName = quiz.type === 'openworld' ? 'Open World' : 'Claw Machine';
+                    const typeName = formattedType;
                     const operationName = quiz.operation === 'mixed' ? 'Mixed Operations' : 
                                          quiz.operation.charAt(0).toUpperCase() + quiz.operation.slice(1);
                     const date = new Date(quiz.createdAt).toLocaleDateString('en-US', { 
@@ -2869,8 +3053,9 @@
                 if (snapshot.exists()) {
                     const quiz = snapshot.val();
                     
+                    const formattedType = formatQuizTypeLabel(quiz.type);
                     const typeIcon = quiz.type === 'openworld' ? '🌍' : '🎮';
-                    const typeName = quiz.type === 'openworld' ? 'Open World' : 'Claw Machine';
+                    const typeName = formattedType;
                     const operationName = quiz.operation === 'mixed' ? 'Mixed Operations' : 
                                          quiz.operation.charAt(0).toUpperCase() + quiz.operation.slice(1);
                     
@@ -2886,44 +3071,40 @@
                     `).join('');
                     document.getElementById('viewQuizProblems').innerHTML = problemsHTML;
                     
-                    // Load and display student results
+                    const questionCount = computeQuestionCount(quiz);
                     const studentResultsTableBody = document.getElementById('viewQuizStudentsTableBody');
-                    
-                    if (quiz.studentResults && Object.keys(quiz.studentResults).length > 0) {
-                        const resultsHTML = await Promise.all(
-                            Object.entries(quiz.studentResults).map(async ([studentId, result]) => {
-                                // Fetch student name from users
-                                const userRef = ref(database, 'users/' + studentId);
-                                const userSnapshot = await get(userRef);
-                                const studentName = userSnapshot.exists() ? 
-                                    (userSnapshot.val().fullname || userSnapshot.val().username || 'Unknown Student') : 
-                                    'Unknown Student';
-                                
-                                // Format time taken (convert seconds to minutes:seconds)
-                                const minutes = Math.floor(result.timeTaken / 60);
-                                const seconds = result.timeTaken % 60;
-                                const timeFormatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                                
-                                return `
-                                    <tr>
-                                        <td>${studentName}</td>
-                                        <td><strong style="color: #667eea;">${result.score}</strong></td>
-                                        <td>${result.accuracy}%</td>
-                                        <td>${timeFormatted}</td>
-                                        <td>${result.answered}/${quiz.questionCount}</td>
-                                    </tr>
-                                `;
-                            })
-                        );
-                        studentResultsTableBody.innerHTML = resultsHTML.join('');
-                    } else {
+                    studentResultsTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #6c7aa0;">Loading results...</td></tr>';
+
+                    const results = await fetchQuizResultsForQuiz(quizId, quiz);
+
+                    if (results.length === 0) {
                         studentResultsTableBody.innerHTML = `
                             <tr>
-                                <td colspan="5" style="text-align: center; padding: 20px; color: #6c7aa0;">
+                                <td colspan="6" style="text-align: center; padding: 20px; color: #6c7aa0;">
                                     No students have taken this quiz yet.
                                 </td>
                             </tr>
                         `;
+                    } else {
+                        const resultsHTML = results.map(result => {
+                            const timeFormatted = formatDurationFromSeconds(result.timeSeconds);
+                const answeredSafe = Number.isFinite(result.answered) ? result.answered : (Number(result.correct) || 0) + (Number(result.incorrect) || 0);
+                const answeredDisplay = questionCount > 0 ? `${answeredSafe}/${questionCount}` : `${answeredSafe}`;
+                            const nameDisplay = result.fullName || (result.username ? `@${result.username}` : 'Unknown Student');
+
+                            return `
+                                <tr>
+                                    <td>${nameDisplay}</td>
+                                    <td><strong style="color: #667eea;">${result.score}</strong></td>
+                                    <td>${result.correct}</td>
+                                    <td>${result.incorrect}</td>
+                                    <td>${timeFormatted}</td>
+                                    <td>${answeredDisplay}</td>
+                                </tr>
+                            `;
+                        }).join('');
+
+                        studentResultsTableBody.innerHTML = resultsHTML;
                     }
                     
                     // Open modal
@@ -2965,7 +3146,11 @@
                     document.getElementById('editQuizDeadline').value = quiz.deadline || '';
                     
                     // Set operation if claw machine
-                    if (quiz.type === 'clawmachine') {
+                    if (isSpecificClawMachineType(quiz.type)) {
+                        document.getElementById('editOperationGroup').style.display = 'none';
+                        document.getElementById('editQuizOperation').required = false;
+                        document.getElementById('editQuizOperation').value = getClawOperationFromType(quiz.type);
+                    } else if (quiz.type === 'clawmachine') {
                         document.getElementById('editOperationGroup').style.display = 'block';
                         document.getElementById('editQuizOperation').required = true;
                         document.getElementById('editQuizOperation').value = quiz.operation || '';
@@ -3014,7 +3199,12 @@
             const operationGroup = document.getElementById('editOperationGroup');
             const operationSelect = document.getElementById('editQuizOperation');
             
-            if (quizType === 'clawmachine') {
+            if (isSpecificClawMachineType(quizType)) {
+                operationGroup.style.display = 'none';
+                operationSelect.required = false;
+                operationSelect.value = getClawOperationFromType(quizType);
+                updateEditQuestionRowsForSpecificClawMachine(quizType);
+            } else if (quizType === 'clawmachine') {
                 operationGroup.style.display = 'block';
                 operationSelect.required = true;
                 updateEditQuestionRowsForClawMachine();
@@ -3035,7 +3225,7 @@
         // Add question row to edit modal
         window.addEditQuestionRow = function(questionData = null) {
             const quizType = document.getElementById('editQuizType').value;
-            const selectedOperation = document.getElementById('editQuizOperation').value;
+            let selectedOperation = document.getElementById('editQuizOperation').value;
             const container = document.getElementById('editQuestionsContainer');
             
             editQuestionCounter++;
@@ -3048,15 +3238,18 @@
             let operatorHTML = '';
             let operatorValue = questionData ? questionData.operator : '';
             
-            if (quizType === 'clawmachine' && selectedOperation) {
-                const operators = {
-                    'addition': '+',
-                    'subtraction': '-',
-                    'multiplication': '×',
-                    'division': '÷'
-                };
-                operatorValue = operators[selectedOperation];
+            if (isSpecificClawMachineType(quizType)) {
+                selectedOperation = getClawOperationFromType(quizType);
+                operatorValue = getOperationSymbol(selectedOperation);
                 operatorHTML = `<input type="text" value="${operatorValue}" readonly style="text-align: center; font-weight: 600; background-color: rgba(102, 126, 234, 0.1);">`;
+            } else if (quizType === 'clawmachine' && selectedOperation) {
+                const symbol = getOperationSymbol(selectedOperation);
+                if (symbol) {
+                    operatorValue = symbol;
+                    operatorHTML = `<input type="text" value="${operatorValue}" readonly style="text-align: center; font-weight: 600; background-color: rgba(102, 126, 234, 0.1);">`;
+                } else {
+                    operatorHTML = `<input type="text" placeholder="Op" readonly style="text-align: center; background-color: #f0f0f0;">`;
+                }
             } else if (quizType === 'openworld' || questionData) {
                 operatorHTML = `
                     <select class="operator-select" name="edit_operator_${editQuestionCounter}" required>
@@ -3093,19 +3286,29 @@
         // Update question rows for claw machine in edit modal
         function updateEditQuestionRowsForClawMachine() {
             const selectedOperation = document.getElementById('editQuizOperation').value;
-            const operators = {
-                'addition': '+',
-                'subtraction': '-',
-                'multiplication': '×',
-                'division': '÷'
-            };
-            
             const rows = document.querySelectorAll('#editQuestionsContainer .question-row');
             rows.forEach(row => {
                 const operatorElement = row.children[1];
-                if (selectedOperation && operators[selectedOperation]) {
-                    operatorElement.outerHTML = `<input type="text" value="${operators[selectedOperation]}" readonly style="text-align: center; font-weight: 600; background-color: rgba(102, 126, 234, 0.1);">`;
+                if (selectedOperation) {
+                    const symbol = getOperationSymbol(selectedOperation);
+                    if (symbol) {
+                        operatorElement.outerHTML = `<input type="text" value="${symbol}" readonly style="text-align: center; font-weight: 600; background-color: rgba(102, 126, 234, 0.1);">`;
+                    }
                 }
+            });
+        }
+
+        function updateEditQuestionRowsForSpecificClawMachine(quizType) {
+            const operation = getClawOperationFromType(quizType);
+            const symbol = getOperationSymbol(operation);
+            if (!symbol) {
+                return;
+            }
+
+            const rows = document.querySelectorAll('#editQuestionsContainer .question-row');
+            rows.forEach(row => {
+                const operatorElement = row.children[1];
+                operatorElement.outerHTML = `<input type="text" value="${symbol}" readonly style="text-align: center; font-weight: 600; background-color: rgba(102, 126, 234, 0.1);">`;
             });
         }
 
@@ -3153,10 +3356,17 @@
                 const operatorElement = row.children[1];
                 
                 let operator = '';
-                if (quizType === 'clawmachine') {
+                if (isSpecificClawMachineType(quizType)) {
+                    operator = getOperationSymbol(getClawOperationFromType(quizType));
+                } else if (quizType === 'clawmachine' || quizType === 'openworld') {
                     operator = operatorElement.value;
-                } else if (quizType === 'openworld') {
-                    operator = operatorElement.value;
+                }
+
+                if (!operator || operator.trim() === '' || operator.toLowerCase() === 'op') {
+                    const resolvedOp = resolveOperationValue(quizType, operation);
+                    if (resolvedOp && resolvedOp !== 'mixed') {
+                        operator = getOperationSymbol(resolvedOp) || operator;
+                    }
                 }
                 
                 questions.push({
@@ -3177,7 +3387,7 @@
                 const updatedQuiz = {
                     name: quizName,
                     type: quizType,
-                    operation: quizType === 'clawmachine' ? operation : 'mixed',
+                    operation: resolveOperationValue(quizType, operation),
                     attempts: attempts,
                     scorePerQuestion: scorePerQuestion,
                     timeLimit: timeLimit,
